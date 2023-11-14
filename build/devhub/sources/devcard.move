@@ -50,6 +50,12 @@ module devhub::devcard {
     new_description: String,
   }
 
+  struct PortfolioUpdate has copy, drop {
+    name: String,
+    owner: address,
+    new_portfolio: String,
+  }
+
   fun init(ctx: &mut TxContext) {
     transfer::share_object(
       DevHub {
@@ -123,7 +129,7 @@ module devhub::devcard {
     _ = old_value;
   }
 
-  public entry fun deactivate_cad(devhub: &mut DevHub, id: u64, ctx: &mut TxContext) {
+  public entry fun deactivate_card(devhub: &mut DevHub, id: u64, ctx: &mut TxContext) {
     let user_card = object_table::borrow_mut(&mut devhub.cards, id);
     assert!(tx_context::sender(ctx) == user_card.owner, NOT_THE_OWNER);
     user_card.open_to_work = false;
@@ -154,6 +160,20 @@ module devhub::devcard {
       card.contact,
       card.open_to_work
     )
+  }
+
+  public fun update_portfolio(ctx: &mut TxContext, devhub: &mut DevHub, id: u64, portfolio: vector<u8>) {
+    let user_card = object_table::borrow_mut(&mut devhub.cards, id);
+    assert!(tx_context::sender(ctx) == user_card.owner, NOT_THE_OWNER);
+    user_card.portfolio = string::utf8(portfolio);
+
+    event::emit(
+      PortfolioUpdate {
+        name: user_card.name,
+        owner: user_card.owner,
+        new_portfolio: string::utf8(portfolio),
+      }
+    );
   }
 
   #[test_only]

@@ -171,7 +171,7 @@ module devhub::devcard {
       PortfolioUpdate {
         name: user_card.name,
         owner: user_card.owner,
-        new_portfolio: string::utf8(user_card.portfolio),
+        new_portfolio: string::utf8(portfolio),
       }
     );
   }
