@@ -50,6 +50,12 @@ module devhub::devcard {
     new_description: String,
   }
 
+  struct PortfolioUpdate has copy, drop {
+    name: String,
+    owner: address,
+    new_portfolio: String,
+  }
+
   fun init(ctx: &mut TxContext) {
     transfer::share_object(
       DevHub {
@@ -160,6 +166,14 @@ module devhub::devcard {
     let user_card = object_table::borrow_mut(&mut devhub.cards, id);
     assert!(tx_context::sender(ctx) == user_card.owner, NOT_THE_OWNER);
     user_card.portfolio = string::utf8(portfolio);
+
+    event::emit(
+      PortfolioUpdate {
+        name: user_card.name,
+        owner: user_card.owner,
+        new_portfolio: string::utf8(user_card.portfolio),
+      }
+    );
   }
 
   #[test_only]
